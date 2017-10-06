@@ -1,0 +1,64 @@
+---
+title: "Untitled"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: columns
+    vertical_layout: fill
+---
+
+```{r setup, include=FALSE}
+library(flexdashboard)
+library(sqldf)
+library(Lahman)
+library(ggplot2)
+```
+
+Column {data-width=650}
+-----------------------------------------------------------------------
+
+### Chart A
+
+```{r}
+query<-"SELECT Salary
+FROM Salaries"
+
+result<-sqldf(query)
+
+ggplot()+
+  geom_histogram(data=result,aes(x=salary), color="blue",fill="white",bins=20)
+```
+
+Column {data-width=350}
+-----------------------------------------------------------------------
+
+### Chart B
+
+```{r}
+query<-"SELECT avg(Salary) AS avgSalary, yearID
+FROM Salaries
+GROUP BY yearID"
+
+result<-sqldf(query)
+
+ggplot()+
+  geom_point(data=result,aes(x=yearID,y=avgSalary))+
+  geom_line(data=result,aes(x=yearID,y=avgSalary))
+```
+
+### Chart C
+
+```{r}
+query<-"SELECT Salary AS salary,HR
+FROM Salaries INNER JOIN Batting
+ON Salaries.yearID=Batting.yearID
+WHERE HR>=10"
+
+result<-sqldf(query)
+
+ggplot()+
+  geom_point(data=result,aes(x=salary,y=HR))+
+  ggtitle("Salaries vs Homerun Production")+
+  xlab("Salary")+
+  ylab("Homeruns")
+```
+
